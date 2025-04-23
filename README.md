@@ -44,6 +44,8 @@ healthcheck.register("MongoDB B", MongoDB(dsn="mongodb://localhost:27017/test"))
 healthcheck.register("InfluxDB C", InfluxDB(url="http://localhost:8086/health"))
 
 print(healthcheck.check())
+print(healthcheck.check(output="str"))
+print(healthcheck.check(output="json", pretty=True))
 ```
 
 * * * * *
@@ -119,7 +121,7 @@ pip install -e ".[dev]"`
 Run tests:
 
 ``` bash
-pytest
+python -m unittest
 ```
 
 * * * * *
