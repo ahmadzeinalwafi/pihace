@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="pihace",
-    version="0.1.0",
+    version="0.2.0",
     author="Ahmad Zein Al Wafi",
     author_email="ahmadzeinalwafi@outlook.com",
     description="Python Integrated Health Check - A modular and extensible health check system for services and system resources.",
@@ -27,15 +27,11 @@ setup(
             "flake8",
         ],
     },
-    python_requires=">=3.7",
+    python_requires=">=3.10",
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
         "Topic :: Software Development :: Libraries :: Python Modules",
-        "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.7",
-        "Programming Language :: Python :: 3.8",
-        "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
         "Operating System :: OS Independent",

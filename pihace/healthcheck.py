@@ -1,28 +1,29 @@
+import json
+from typing import Callable, Dict, Union
+
 from .utils import get_utc_timestamp, calculate_status, format_rate
 from .system_info import get_system_info
-from .base_checker import BaseChecker
 
 class HealthCheck:
-    def __init__(self, name="unnamed", version="v0.0.1", with_system=True):
-        self.name = name
-        self.version = version
+    def __init__(self, with_system: bool = False, name: str = None, version: str = None):
         self.with_system = with_system
-        self.services = {}
+        self.component_name = name
+        self.component_version = version
+        self.checkers: Dict[str, Callable[[], Union[bool, tuple]]] = {}
 
-    def register(self, name, checker):
-        self.services[name] = checker
+    def register(self, name: str, checker: Callable):
+        self.checkers[name] = checker
 
-    def check(self):
+    def check(self, output: str = "dict", pretty: bool = True) -> Union[dict, str]:
         failures = {}
-        total = len(self.services)
-        passed = 0
+        success_count = 0
+        total_count = len(self.checkers)
 
-        for name, checker in self.services.items():
+        for name, checker in self.checkers.items():
             try:
-                result = checker() if callable(checker) else checker.check()
-
+                result = checker() if callable(checker) else False
                 if result is True:
-                    passed += 1
+                    success_count += 1
                 elif isinstance(result, tuple) and not result[0]:
                     failures[name] = result[1]
                 else:
@@ -30,21 +31,42 @@ class HealthCheck:
             except Exception as e:
                 failures[name] = str(e)
 
-        status = calculate_status(total, passed)
-        timestamp = get_utc_timestamp()
-
-        result = {
+        status = calculate_status(success_count, total_count)
+        response = {
             "status": status,
-            "timestamp": timestamp,
-            "failure": failures,
-            "rate": format_rate(passed, total),
+            "timestamp": get_utc_timestamp(),
+            "failure": failures if failures else None,
+            "rate": format_rate(success_count, total_count),
+            "system": get_system_info() if self.with_system else None,
             "component": {
-                "name": self.name,
-                "version": self.version
-            }
+                "name": self.component_name,
+                "version": self.component_version
+            } if self.component_name and self.component_version else None
         }
 
-        if self.with_system:
-            result["system"] = get_system_info()
+        if output == "json":
+            return json.dumps(response, indent=4 if pretty else None)
+        elif output == "str":
+            lines = [
+                f"Status: {response['status']} ({response['rate']} healthy)",
+                f"Timestamp: {response['timestamp']}"
+            ]
+            if failures:
+                lines.append("Failures:")
+                for k, v in failures.items():
+                    lines.append(f" - {k}: {v}")
+            if response.get("component"):
+                lines.append(f"Component: {response['component']['name']} {response['component']['version']}")
+            if self.with_system:
+                sysinfo = response.get("system", {})
+                lines.append("System: " + ", ".join([
+                    f"CPU {sysinfo.get('cpu_usage')}",
+                    f"Mem {sysinfo.get('memory_usage')}",
+                    f"Disk {sysinfo.get('disk_usage')}",
+                    f"Free Mem: {sysinfo.get('memory_available')}",
+                    f"Python {sysinfo.get('python_version')}",
+                    f"OS: {sysinfo.get('os')}"
+                ]))
+            return "\n".join(lines)
 
-        return result
+        return response

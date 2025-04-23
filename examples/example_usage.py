@@ -9,4 +9,9 @@ hc.register("MySQL A", MySQL(dsn="mysql://root:root@localhost:3306/testdb"))
 hc.register("MongoDB B", MongoDB(dsn="mongodb://localhost:27017"))
 hc.register("InfluxDB C", InfluxDB(url="http://localhost:8086", token="admintoken", org="myorg"))
 
+def function_that_mock_failure():
+    return (False, "something broke")
+
+print(hc.check(output="str"))
+print(hc.check(output="json", pretty=True))
 print(hc.check())
