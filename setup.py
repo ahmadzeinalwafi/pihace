@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="pihace",
-    version="0.2.0",
+    version="0.3.0",
     author="Ahmad Zein Al Wafi",
     author_email="ahmadzeinalwafi@outlook.com",
     description="Python Integrated Health Check - A modular and extensible health check system for services and system resources.",
@@ -19,7 +19,8 @@ setup(
         "psutil>=5.9.0",
         "pymongo>=4.3.0",
         "mysql-connector-python>=8.0.30",
-        "influxdb-client>=1.36.0"
+        "influxdb-client>=1.36.0",
+        "requests>=2.32.3"
     ],
     extras_require={
         "dev": [

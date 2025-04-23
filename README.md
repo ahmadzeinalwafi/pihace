@@ -11,9 +11,9 @@
 ## ✨ Features
 
 - ✅ Built-in system checks: CPU, memory, disk usage, Python version, OS
-- 📦 Modular service checks: MySQL, MongoDB, InfluxDB, and more
+- 📦 Modular service checks: MySQL, MongoDB, InfluxDB, HTTP, and more
 - 🧩 Custom check functions
-- 🧾 Unified health output format
+- 🧾 Diverse health output format
 - 🐍 Pythonic API design
 - 🔧 Extensible with easy `register()` method
 
@@ -29,23 +29,22 @@ pip install pihace
 --------------
 
 ```python
+from pihace.healthcheck import HealthCheck
+from pihace.checkers.mysql import MySQL
+from pihace.checkers.mongodb import MongoDB
+from pihace.checkers.influxdb import InfluxDB
+from pihace.checkers.http import HTTP
 
-import pihace
-from pihace.checkers import MySQL, MongoDB, InfluxDB
+hc = HealthCheck(with_system=True, name="example-api", version="v0.1.0")
 
-healthcheck = pihace.HealthCheck(
-    with_system=True,
-    component_name="something-api",
-    component_version="v1.0.0"
-)
+hc.register("MySQL A", MySQL(dsn="mysql://root:root@localhost:3306/testdb"))
+hc.register("MongoDB B", MongoDB(dsn="mongodb://localhost:27017"))
+hc.register("InfluxDB C", InfluxDB(url="http://localhost:8086", token="admintoken", org="myorg"))
+hc.register("HTTP D", HTTP(url="https://example.com"))
 
-healthcheck.register("MySQL A", MySQL(dsn="mysql://root:root@127.0.0.1:3306/testdb"))
-healthcheck.register("MongoDB B", MongoDB(dsn="mongodb://localhost:27017/test"))
-healthcheck.register("InfluxDB C", InfluxDB(url="http://localhost:8086/health"))
-
-print(healthcheck.check())
-print(healthcheck.check(output="str"))
-print(healthcheck.check(output="json", pretty=True))
+print(hc.check(output="str"))
+print(hc.check(output="json", pretty=True))
+print(hc.check())
 ```
 
 * * * * *
@@ -102,6 +101,8 @@ healthcheck.register("Mock Success", function_that_mock_success)`
 
 -   ✅ **InfluxDB**
 
+-   ✅ **HTTP**
+
 -   🧩 Custom check functions
 
 More integrations are coming soon!
@@ -114,7 +115,7 @@ More integrations are coming soon!
 Clone this repository:
 
 ```bash
-git clone https://github.com/yourusername/pihace.git
+git clone https://github.com/ahmadzeinalwafi/pihace.git
 cd pihace
 pip install -e ".[dev]"`
 ```
@@ -147,7 +148,7 @@ This project is licensed under the **Apache License 2.0**.
 🤝 Contributing
 ---------------
 
-Contributions are welcome! Please open an issue or PR to add new checkers, fix bugs, or suggest improvements.
+Contributions are welcome! Please open an issue or PR to add new checkers, fix bugs, or suggest improvements on [github](https://github.com/ahmadzeinalwafi/pihace/issues).
 
 * * * * *
 
