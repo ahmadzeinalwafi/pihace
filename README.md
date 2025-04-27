@@ -13,6 +13,7 @@
 - ✅ Built-in system checks: CPU, memory, disk usage, Python version, OS
 - 📦 Modular service checks: MySQL, MongoDB, InfluxDB, HTTP, and more
 - 🧩 Custom check functions
+- 📧 Providers buildin: HTTP Service
 - 🧾 Diverse health output format
 - 🐍 Pythonic API design
 - 🔧 Extensible with easy `register()` method
@@ -106,7 +107,12 @@ healthcheck.register("Mock Success", function_that_mock_success)`
 
 -   🧩 Custom check functions
 
-More plugins are coming soon!
+🔌 Supported Providers
+---------------------
+
+-   ✅ **Web HTTP**
+
+More plugins and providers are coming soon!
 
 * * * * *
 
