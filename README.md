@@ -30,10 +30,10 @@ pip install pihace
 
 ```python
 from pihace.healthcheck import HealthCheck
-from pihace.checkers.mysql import MySQL
-from pihace.checkers.mongodb import MongoDB
-from pihace.checkers.influxdb import InfluxDB
-from pihace.checkers.http import HTTP
+from pihace.plugin.mysql import MySQL
+from pihace.plugin.mongodb import MongoDB
+from pihace.plugin.influxdb import InfluxDB
+from pihace.plugin.http import HTTP
 
 hc = HealthCheck(with_system=True, name="example-api", version="v0.1.0")
 
@@ -105,7 +105,7 @@ healthcheck.register("Mock Success", function_that_mock_success)`
 
 -   🧩 Custom check functions
 
-More integrations are coming soon!
+More plugins are coming soon!
 
 * * * * *
 

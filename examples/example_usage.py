@@ -1,8 +1,8 @@
 from pihace.healthcheck import HealthCheck
-from pihace.checkers.mysql import MySQL
-from pihace.checkers.mongodb import MongoDB
-from pihace.checkers.influxdb import InfluxDB
-from pihace.checkers.http import HTTP
+from pihace.plugin.mysql import MySQL
+from pihace.plugin.mongodb import MongoDB
+from pihace.plugin.influxdb import InfluxDB
+from pihace.plugin.http import HTTP
 
 hc = HealthCheck(with_system=True, name="example-api", version="v0.1.0")
 
