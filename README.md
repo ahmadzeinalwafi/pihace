@@ -30,10 +30,10 @@ pip install pihace
 
 ```python
 from pihace.healthcheck import HealthCheck
-from pihace.plugin.mysql import MySQL
-from pihace.plugin.mongodb import MongoDB
-from pihace.plugin.influxdb import InfluxDB
-from pihace.plugin.http import HTTP
+from pihace.plugins.mysql import MySQL
+from pihace.plugins.mongodb import MongoDB
+from pihace.plugins.influxdb import InfluxDB
+from pihace.plugins.http import HTTP
 
 hc = HealthCheck(with_system=True, name="example-api", version="v0.1.0")
 

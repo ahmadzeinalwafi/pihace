@@ -1,5 +1,6 @@
 import json
 from typing import Callable, Dict, Union
+from multiprocessing import Process, Queue
 
 from .utils import get_utc_timestamp, calculate_status, format_rate
 from .system_info import get_system_info
@@ -14,6 +15,13 @@ class HealthCheck:
     def register(self, name: str, checker: Callable):
         self.checkers[name] = checker
 
+    def _run_checker(self, checker, result_queue):
+        try:
+            result = checker()
+            result_queue.put(result)
+        except Exception as e:
+            result_queue.put((False, str(e)))
+
     def check(self, output: str = "dict", pretty: bool = True) -> Union[dict, str]:
         failures = {}
         success_count = 0
@@ -21,7 +29,16 @@ class HealthCheck:
 
         for name, checker in self.checkers.items():
             try:
-                result = checker() if callable(checker) else False
+                result_queue = Queue()
+                checking = Process(target=self._run_checker, args=(checker, result_queue), name=str(name + "_process"))
+                checking.start()
+                checking.join(timeout=5)
+
+                if checking.is_alive():
+                    checking.terminate()
+                    failures[name] = "pihace: process timeout"
+                    continue
+                result = result_queue.get()
                 if result is True:
                     success_count += 1
                 elif isinstance(result, tuple) and not result[0]:
