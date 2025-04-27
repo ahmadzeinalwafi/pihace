@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="pihace",
-    version="0.4.0",
+    version="0.5.0",
     author="Ahmad Zein Al Wafi",
     author_email="ahmadzeinalwafi@outlook.com",
     description="Python Integrated Health Check - A modular and extensible health check system for services and system resources.",

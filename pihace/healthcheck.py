@@ -12,10 +12,16 @@ class HealthCheck:
         self.component_version = version
         self.checkers: Dict[str, Callable[[], Union[bool, tuple]]] = {}
 
-    def register(self, name: str, checker: Callable):
-        self.checkers[name] = checker
+    def register(self, name: str, checker: Callable, timeout: int = 5, retries: int = 2) -> None:
+        if not callable(checker):
+            raise ValueError("Checker must be a callable function")
+        self.checkers[name] = {
+            'checker': checker,
+            'timeout': timeout,
+            'retries': retries
+        }
 
-    def _run_checker(self, checker, result_queue):
+    def _run_checker(self, checker, result_queue) -> None:
         try:
             result = checker()
             result_queue.put(result)
@@ -27,26 +33,33 @@ class HealthCheck:
         success_count = 0
         total_count = len(self.checkers)
 
-        for name, checker in self.checkers.items():
-            try:
-                result_queue = Queue()
-                checking = Process(target=self._run_checker, args=(checker, result_queue), name=str(name + "_process"))
-                checking.start()
-                checking.join(timeout=5)
+        for name, data in self.checkers.items():
+            checker = data['checker']
+            timeout = data['timeout']
+            retries = data['retries']
+            for i in range(retries):
+                try:
+                    result_queue = Queue()
+                    checking = Process(target=self._run_checker, args=(checker, result_queue), name=str(name + "_process"))
+                    checking.start()
+                    checking.join(timeout=timeout)
 
-                if checking.is_alive():
-                    checking.terminate()
-                    failures[name] = "pihace: process timeout"
-                    continue
-                result = result_queue.get()
-                if result is True:
-                    success_count += 1
-                elif isinstance(result, tuple) and not result[0]:
-                    failures[name] = result[1]
-                else:
-                    failures[name] = "pihace: log are unavailable"
-            except Exception as e:
-                failures[name] = str(e)
+                    if checking.is_alive():
+                        checking.terminate()
+                        failures[name] = "pihace: process timeout"
+                        continue
+
+                    result = result_queue.get()
+                    if result is True:
+                        success_count += 1
+                        break
+                    elif isinstance(result, tuple) and not result[0]:
+                        failures[name] = result[1]
+                        break
+                    else:
+                        failures[name] = "pihace: log are unavailable"
+                except Exception as e:
+                    failures[name] = str(e)
 
         status = calculate_status(success_count, total_count)
         response = {
