@@ -1,6 +1,8 @@
 import json
 from typing import Callable, Dict, Union
 from multiprocessing import Process, Queue
+import asyncio
+import inspect
 
 from .utils import get_utc_timestamp, calculate_status, format_rate
 from .system_info import get_system_info
@@ -29,37 +31,45 @@ class HealthCheck:
             result_queue.put((False, str(e)))
 
     def check(self, output: str = "dict", pretty: bool = True) -> Union[dict, str]:
+        return asyncio.run(self._check_async(output, pretty))
+
+    async def _check_async(self, output: str = "dict", pretty: bool = True) -> Union[dict, str]:
         failures = {}
         success_count = 0
         total_count = len(self.checkers)
 
-        for name, data in self.checkers.items():
-            checker = data['checker']
-            timeout = data['timeout']
-            retries = data['retries']
-            for i in range(retries):
+        async def run_checker_with_retries(name, checker, retries, timeout):
+            for attempt in range(retries):
                 try:
-                    result_queue = Queue()
-                    checking = Process(target=self._run_checker, args=(checker, result_queue), name=str(name + "_process"))
-                    checking.start()
-                    checking.join(timeout=timeout)
-
-                    if checking.is_alive():
-                        checking.terminate()
-                        failures[name] = "pihace: process timeout"
-                        continue
-
-                    result = result_queue.get()
-                    if result is True:
-                        success_count += 1
-                        break
-                    elif isinstance(result, tuple) and not result[0]:
-                        failures[name] = result[1]
-                        break
+                    if inspect.iscoroutinefunction(checker):
+                        # Native async checker
+                        result = await asyncio.wait_for(checker(), timeout=timeout)
                     else:
-                        failures[name] = "pihace: log are unavailable"
+                        # Synchronous checker wrapped in async thread
+                        result = await asyncio.wait_for(asyncio.to_thread(checker), timeout=timeout)
+                    return result
+                except asyncio.TimeoutError:
+                    if attempt == retries - 1:
+                        return (False, "pihace: async timeout")
                 except Exception as e:
-                    failures[name] = str(e)
+                    return (False, str(e))
+            return (False, "pihace: unknown error after retries")
+
+        tasks = [
+            run_checker_with_retries(name, data['checker'], data['retries'], data['timeout'])
+            for name, data in self.checkers.items()
+        ]
+
+        names = list(self.checkers.keys())
+        results = await asyncio.gather(*tasks)
+
+        for name, result in zip(names, results):
+            if result is True:
+                success_count += 1
+            elif isinstance(result, tuple) and not result[0]:
+                failures[name] = result[1]
+            else:
+                failures[name] = "pihace: log are unavailable"
 
         status = calculate_status(success_count, total_count)
         response = {

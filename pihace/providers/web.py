@@ -9,9 +9,14 @@ class WebProvider:
         self._setup_routes()
 
     def _setup_routes(self):
-        @self.app.get("/health")
+        @self.app.get("/healthcheck")
         async def health_check():
-            return JSONResponse(content=self.healthcheck.check())
+            result = await self.healthcheck._check_async()
+            return JSONResponse(content=result)
+        
+        @self.app.get("/")
+        async def status():
+            return JSONResponse(content={'status': 'ok', 'message': 'pihace web server is running'})
 
     def serve(self, host: str = '0.0.0.0', port: int = 8000):
         import uvicorn
