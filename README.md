@@ -5,6 +5,7 @@
 ![PyPI](https://img.shields.io/pypi/v/pihace)
 ![Python Version](https://img.shields.io/pypi/pyversions/pihace)
 ![License](https://img.shields.io/pypi/l/pihace)
+![GitHub Repo stars](https://img.shields.io/github/stars/ahmadzeinalwafi/pihace)
 
 ---
 
