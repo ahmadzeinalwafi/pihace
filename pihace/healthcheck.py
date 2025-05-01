@@ -79,7 +79,7 @@ class HealthCheck:
         """
         return asyncio.run(self._check_async(output, pretty))
     
-    async def run_checker_with_retries(name, checker, retries, timeout):
+    async def run_checker_with_retries(self, name, checker, retries, timeout):
         """
         Attempt to run a checker with retries and timeout.
 
