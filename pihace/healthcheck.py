@@ -1,6 +1,6 @@
 import json
 from typing import Callable, Dict, Union
-from multiprocessing import Process, Queue
+from time import time
 import asyncio
 import inspect
 
@@ -34,6 +34,7 @@ class HealthCheck:
         return asyncio.run(self._check_async(output, pretty))
 
     async def _check_async(self, output: str = "dict", pretty: bool = True) -> Union[dict, str]:
+        start_time = time()
         failures = {}
         success_count = 0
         total_count = len(self.checkers)
@@ -72,11 +73,13 @@ class HealthCheck:
                 failures[name] = "pihace: log are unavailable"
 
         status = calculate_status(success_count, total_count)
+        end_time = time() - start_time
         response = {
             "status": status,
             "timestamp": get_utc_timestamp(),
             "failure": failures if failures else None,
             "rate": format_rate(success_count, total_count),
+            "duration": end_time,
             "system": get_system_info() if self.with_system else None,
             "component": {
                 "name": self.component_name,
