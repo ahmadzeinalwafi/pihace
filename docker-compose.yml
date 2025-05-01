@@ -34,6 +34,17 @@ services:
       timeout: 5s
       retries: 3
 
+  mongo-express:
+    image: mongo-express:latest
+    restart: always
+    container_name: mongo_express
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_URL: mongodb://mongo:27017/
+    depends_on:
+      - mongo
+
   influxdb:
     image: influxdb:2.7
     ports:
