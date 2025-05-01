@@ -15,6 +15,8 @@
 - 📦 Modular service checks: MySQL, MongoDB, InfluxDB, HTTP, and more
 - 🧩 Custom check functions
 - 📧 Providers buildin: HTTP Service
+- 📧 Pusher buildin: Elastic Search
+- 🗃️ Storage buildin: MongoDB
 - 🧾 Diverse health output format
 - 🐍 Pythonic API design
 - 🔧 Extensible with easy `register()` method
@@ -113,7 +115,17 @@ healthcheck.register("Mock Success", function_that_mock_success)`
 
 -   ✅ **Web HTTP**
 
-More plugins and providers are coming soon!
+🔌 Supported Pusher
+---------------------
+
+-   ✅ **Elastic Search**
+
+🔌 Supported Storage
+---------------------
+
+-   ✅ **MongoDB**
+
+More plugins, providers, pusher, and storage are coming soon!
 
 * * * * *
 
