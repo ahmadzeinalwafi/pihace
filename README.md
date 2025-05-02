@@ -106,6 +106,8 @@ healthcheck.register("Mock Success", function_that_mock_success)`
 
 -   ✅ **InfluxDB**
 
+-   ✅ **ElasticSearch**
+
 -   ✅ **HTTP**
 
 -   🧩 Custom check functions
@@ -114,11 +116,12 @@ healthcheck.register("Mock Success", function_that_mock_success)`
 ---------------------
 
 -   ✅ **Web HTTP**
+-   ✅ **Prometheus**
 
 🔌 Supported Pusher
 ---------------------
 
--   ✅ **Elastic Search**
+-   ✅ **ElasticSearch**
 
 🔌 Supported Storage
 ---------------------
