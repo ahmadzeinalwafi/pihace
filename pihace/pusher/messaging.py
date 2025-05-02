@@ -5,6 +5,7 @@ import json
 import pika
 import traceback
 from pihace.healthcheck import HealthCheck
+from time import sleep
 
 class AMQPPusher:
     """
@@ -31,10 +32,7 @@ class AMQPPusher:
         self.connection = pika.BlockingConnection(parameters)
         self.channel = self.connection.channel()
 
-        # Ensure the queue exists
-        self.channel.queue_declare(queue=self.queue_name, durable=True)
-
-    def push(self):
+    def push(self) -> bool | tuple[bool, str]:
         """
         Sends a health check result payload to the configured RabbitMQ queue.
 
@@ -46,6 +44,8 @@ class AMQPPusher:
             tuple[bool, str]: (False, error message) if an exception occurred.
         """
         try:
+            self.channel.queue_declare(queue=self.queue_name, durable=True)
+
             result = self.healthcheck.check(output="dict")
             message = json.dumps(result)
 
@@ -58,9 +58,24 @@ class AMQPPusher:
                     delivery_mode=2  # make message persistent
                 ),
             )
-
-            self.connection.close()
             return True
 
         except Exception as e:
             return False, traceback.format_exc()
+        
+    def close(self) -> None:
+        """
+        Closes the AMQP connection.
+        """
+        self.connection.close()
+        
+    def push_forever_in_loop(self, interval: int = 60) -> None:
+        """
+        Continuously sends health check results to the RabbitMQ queue at specified intervals.
+
+        Args:
+            interval (int): Time in seconds between each health check and message push.
+        """
+        while True:
+            self.push()
+            sleep(interval)

@@ -10,3 +10,5 @@ es_url = "http://localhost:9200"
 hc.register("Elastic Search Cluster", ElasticSearch(es_url=es_url), timeout=5, retries=2)
 logger = ElasticSearchPusher(es_url=es_url, healthcheck=hc)
 logger.push()
+
+# logger.push_forever_in_loop(interval=60)

@@ -6,3 +6,5 @@ hc.register("example", lambda: True)
 
 publisher = AMQPPusher(amqp_url="amqp://guest:guest@localhost:5672/", healthcheck=hc)
 publisher.push()
+
+publisher.push_forever_in_loop(interval=5)

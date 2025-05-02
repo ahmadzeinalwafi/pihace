@@ -4,6 +4,7 @@
 import traceback
 from elasticsearch import Elasticsearch
 from pihace.healthcheck import HealthCheck
+from time import sleep
 
 class ElasticSearchPusher:
     def __init__(self, es_url: str, healthcheck: HealthCheck, index: str = "pihace-health"):
@@ -32,4 +33,15 @@ class ElasticSearchPusher:
         except Exception:
             print("Unexpected error:\n", traceback.format_exc())
             return False
+    
+            
+    def push_forever_in_loop(self, interval: int = 60) -> None:
+        """
+        Run the health check and push the result to Elasticsearch in a loop.
+
+        :param interval: Time in seconds between each health check.
+        """
+        while True:
+            self.push()
+            sleep(interval)
 
