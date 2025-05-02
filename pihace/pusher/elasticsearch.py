@@ -32,3 +32,4 @@ class ElasticSearchPusher:
         except Exception:
             print("Unexpected error:\n", traceback.format_exc())
             return False
+

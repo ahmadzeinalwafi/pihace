@@ -4,7 +4,7 @@
 import json
 import pika
 import traceback
-from typing import Any
+from pihace.healthcheck import HealthCheck
 
 class AMQPPusher:
     """
@@ -18,12 +18,13 @@ class AMQPPusher:
         amqp_url (str): The AMQP connection URL.
         queue_name (str): The name of the target queue.
     """
-    def __init__(self, amqp_url: str, queue_name: str = "pihace.healthcheck"):
+    def __init__(self, amqp_url: str, healthcheck: HealthCheck, queue_name: str = "pihace.healthcheck"):
         """
         Initializes the AMQPPusher with the provided AMQP URL and queue name.
         """
         self.amqp_url = amqp_url
         self.queue_name = queue_name
+        self.healthcheck = healthcheck
 
         # Parse the AMQP URL
         parameters = pika.URLParameters(self.amqp_url)
@@ -33,7 +34,7 @@ class AMQPPusher:
         # Ensure the queue exists
         self.channel.queue_declare(queue=self.queue_name, durable=True)
 
-    def push(self, data: dict[str, Any]):
+    def push(self):
         """
         Sends a health check result payload to the configured RabbitMQ queue.
 
@@ -45,8 +46,8 @@ class AMQPPusher:
             tuple[bool, str]: (False, error message) if an exception occurred.
         """
         try:
-            # Convert the data to JSON
-            message = json.dumps(data)
+            result = self.healthcheck.check(output="dict")
+            message = json.dumps(result)
 
             # Publish the message
             self.channel.basic_publish(
