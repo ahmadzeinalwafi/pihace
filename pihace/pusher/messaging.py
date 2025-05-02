@@ -76,6 +76,7 @@ class AMQPPusher:
         Args:
             interval (int): Time in seconds between each health check and message push.
         """
+        print(f"Starting to push health check results to RabbitMQ every {interval} seconds...")
         while True:
             self.push()
             sleep(interval)

@@ -14,8 +14,8 @@
 - ✅ Built-in system checks: CPU, memory, disk usage, Python version, OS
 - 📦 Modular service checks: MySQL, MongoDB, InfluxDB, HTTP, and more
 - 🧩 Custom check functions
-- 📧 Providers buildin: HTTP Service
-- 📧 Pusher buildin: Elastic Search
+- 📧 Providers buildin: HTTP Server, Prometheus
+- 📧 Pusher buildin: Elastic Search, AMPQ Publisher
 - 🗃️ Storage buildin: MongoDB
 - 🧾 Diverse health output format
 - 🐍 Pythonic API design
@@ -122,6 +122,7 @@ healthcheck.register("Mock Success", function_that_mock_success)`
 ---------------------
 
 -   ✅ **ElasticSearch**
+-   ✅ **AMQP Messaging**
 
 🔌 Supported Storage
 ---------------------

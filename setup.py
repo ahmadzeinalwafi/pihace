@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="pihace",
-    version="0.14.0",
+    version="1.0.0",
     author="Ahmad Zein Al Wafi",
     author_email="ahmadzeinalwafi@outlook.com",
     description="Python Integrated Health Check - A modular and extensible health check system for services and system resources.",
@@ -24,6 +24,8 @@ setup(
         "elasticsearch==8.11.1",
         "prometheus_client==0.21.1",
         "pika==1.3.2",
+        "pyyaml>=6.0",
+        "fastapi>=0.115.0",
     ],
     extras_require={
         "dev": [

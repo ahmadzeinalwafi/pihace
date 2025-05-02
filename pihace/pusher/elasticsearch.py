@@ -41,6 +41,7 @@ class ElasticSearchPusher:
 
         :param interval: Time in seconds between each health check.
         """
+        print(f"Starting to push health check results to Elasticsearch every {interval} seconds...")
         while True:
             self.push()
             sleep(interval)

@@ -56,6 +56,7 @@ class MongoStorage:
         :param healthcheck: HealthCheck instance to run.
         :param interval: Time in seconds between each health check.
         """
+        print(f"Starting to save health check results to MongoDB every {interval} seconds...")
         while True:
             result = self.healthcheck.check(output="dict")
             self.save(result)
