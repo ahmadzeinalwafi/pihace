@@ -19,7 +19,7 @@ class AMQPPusher:
         amqp_url (str): The AMQP connection URL.
         queue_name (str): The name of the target queue.
     """
-    def __init__(self, amqp_url: str, healthcheck: HealthCheck, queue_name: str = "pihace.healthcheck"):
+    def __init__(self, healthcheck: HealthCheck, amqp_url: str, queue_name: str = "pihace.healthcheck"):
         """
         Initializes the AMQPPusher with the provided AMQP URL and queue name.
         """

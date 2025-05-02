@@ -4,7 +4,7 @@
 from fastapi import FastAPI
 from prometheus_client import Gauge, generate_latest, CONTENT_TYPE_LATEST
 from fastapi.responses import Response
-from ..healthcheck import HealthCheck
+from pihace.healthcheck import HealthCheck
 import uvicorn
 
 class PrometheusProvider:
@@ -12,15 +12,19 @@ class PrometheusProvider:
     PrometheusProvider exposes health check metrics for Prometheus scraping.
     """
 
-    def __init__(self, healthcheck: HealthCheck):
+    def __init__(self, healthcheck: HealthCheck, host: str = "0.0.0.0", port: int = 9090):
         """
         Initialize the provider with a HealthCheck instance.
 
         :param healthcheck: A HealthCheck object containing registered checkers.
+        :param host: Host address to bind.
+        :param port: Port to serve on.
         """
         self.healthcheck = healthcheck
         self.app = FastAPI()
         self._setup_routes()
+        self.host = host
+        self.port = port
 
         # Core metric
         self.status_metric = Gauge("pihace_status", "Overall health status (1=healthy, 0=unhealthy)", ["component"])
@@ -85,11 +89,8 @@ class PrometheusProvider:
 
             return Response(content=generate_latest(), media_type=CONTENT_TYPE_LATEST)
 
-    def serve(self, host: str = "0.0.0.0", port: int = 9090):
+    def serve(self):
         """
         Serve the metrics endpoint using Uvicorn.
-
-        :param host: Host address to bind.
-        :param port: Port to serve on.
         """
-        uvicorn.run(self.app, host=host, port=port)
+        uvicorn.run(self.app, host=self.host, port=self.port)

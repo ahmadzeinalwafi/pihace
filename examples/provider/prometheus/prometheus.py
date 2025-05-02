@@ -8,4 +8,4 @@ hc.register("HTTP D", HTTP(url="https://example.com"))
 hc.register("HTTP E", HTTP(url="https://asdasdjnladojanbdbaiu.com"))
 
 exporter = PrometheusProvider(healthcheck=hc)
-exporter.serve(port=5001)
+exporter.serve()

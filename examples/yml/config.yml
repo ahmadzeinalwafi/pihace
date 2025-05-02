@@ -1,0 +1,25 @@
+instance:
+  name: my_app
+  version: 1.0.0
+  with_system: true
+
+plugins:
+  - name: Example HTTP Check
+    type: http
+    config:
+      url: https://example.com
+
+providers:
+  - type: web_provider
+    config:
+      host: 0.0.0.0
+      port: 8090
+
+pushers:
+  - type: amqp_pusher
+    config:
+      amqp_url: amqp://guest:guest@localhost:5672/
+      queue_name: pihace.healthcheck
+
+    push_config:
+      interval: 5

@@ -3,7 +3,6 @@
 
 from elasticsearch import Elasticsearch
 
-
 class ElasticSearch:
     """Elasticsearch health checker for pihace."""
     

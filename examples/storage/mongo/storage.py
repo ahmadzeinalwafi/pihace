@@ -6,5 +6,6 @@ hc = HealthCheck(with_system=True, name="MyApp", version="1.0.0")
 hc.register("HTTP D", HTTP(url="https://example.com"))
 result = hc.check()
 
-storage = MongoStorage(dsn="mongodb://localhost:27017", database="myapp", collection="hc_logs")
-storage.save(result)
+storage = MongoStorage(hc, dsn="mongodb://localhost:27017", database="myapp", collection="hc_logs")
+storage.save()
+# storage.run_forever_in_loop(interval=60)

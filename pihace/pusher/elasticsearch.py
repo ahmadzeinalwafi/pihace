@@ -7,7 +7,7 @@ from pihace.healthcheck import HealthCheck
 from time import sleep
 
 class ElasticSearchPusher:
-    def __init__(self, es_url: str, healthcheck: HealthCheck, index: str = "pihace-health"):
+    def __init__(self, healthcheck: HealthCheck, es_url: str, index: str = "pihace-health"):
         """
         Initialize the ElasticSearchPusher.
 

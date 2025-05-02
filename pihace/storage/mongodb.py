@@ -4,12 +4,14 @@
 from pymongo import MongoClient
 from pymongo.errors import PyMongoError
 from datetime import datetime
+from pihace.healthcheck import HealthCheck
+from time import sleep
 import traceback
 
 class MongoStorage:
     """MongoDB storage for health check results."""
 
-    def __init__(self, dsn: str, database: str = "pihace", collection: str = "health_logs"):
+    def __init__(self, healthcheck: HealthCheck, dsn: str, database: str = "pihace", collection: str = "health_logs"):
         """
         Initialize the MongoStorage instance.
 
@@ -20,6 +22,7 @@ class MongoStorage:
         self.dsn = dsn
         self.database = database
         self.collection = collection
+        self.healthcheck = healthcheck
         try:
             self.client = MongoClient(self.dsn, serverSelectionTimeoutMS=2000)
             self.db = self.client[self.database]
@@ -27,7 +30,7 @@ class MongoStorage:
         except PyMongoError as e:
             raise RuntimeError(f"Failed to connect to MongoDB: {str(e)}")
 
-    def save(self, data: dict) -> bool:
+    def save(self) -> bool:
         """
         Save a health check result to the collection.
 
@@ -35,8 +38,9 @@ class MongoStorage:
         :return: True if saved successfully, False otherwise.
         """
         try:
-            data["logged_at"] = datetime.utcnow()
-            self.col.insert_one(data)
+            result = self.healthcheck.check(output="dict")
+            result["logged_at"] = datetime.utcnow()
+            self.col.insert_one(result)
             return True
         except PyMongoError as e:
             print(f"[MongoStorage] Mongo error: {e}")
@@ -44,3 +48,15 @@ class MongoStorage:
         except Exception:
             print(f"[MongoStorage] Unknown error: {traceback.format_exc()}")
             return False
+
+    def run_forever_in_loop(self, interval: int = 60) -> None:
+        """
+        Run the health check and save the result to MongoDB in a loop.
+
+        :param healthcheck: HealthCheck instance to run.
+        :param interval: Time in seconds between each health check.
+        """
+        while True:
+            result = self.healthcheck.check(output="dict")
+            self.save(result)
+            sleep(interval)
